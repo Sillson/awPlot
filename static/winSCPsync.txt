@@ -1,0 +1,65 @@
+# Automatically abort script on errors
+#option batch abort
+# Disable overwrite confirmations that conflict with the previous
+option confirm off
+# Connect
+open sftp://beau.uriona:XT6WmbZIP3g78GqR@www.wcc.nrcs.usda.gov/ -hostkey="ssh-rsa 2048 ab:0e:d1:a3:d3:16:c9:dd:f3:6d:18:1f:51:9e:e0:24"
+
+#**********************************************************************************
+#				Site Charts
+#**********************************************************************************
+
+# Change remote directory
+cd /opt/ftp/states/ut/iCharts_ECM/siteCharts/
+# Force binary mode transfer
+option transfer binary
+# put all html files in folder
+put C:\Users\Beau.Uriona\Desktop\awPlot_ECM\siteCharts\*
+
+#**********************************************************************************
+#				Basin Charts
+#**********************************************************************************
+
+# Change remote directory
+cd /opt/ftp/states/ut/iCharts_ECM/basinCharts
+# Force binary mode transfer
+option transfer binary
+# put all html files in folder
+put C:\Users\Beau.Uriona\Desktop\awPlot_ECM\basinCharts\*
+
+#**********************************************************************************
+#				Basin Maps 
+#**********************************************************************************
+# Change remote directory
+cd /opt/ftp/states/ut/iCharts_ECM/basinMaps
+# Force binary mode transfer
+option transfer binary
+# put all html files in folder
+put C:\Users\Beau.Uriona\Desktop\awPlot_ECM\basinMaps\*
+
+#**********************************************************************************
+#				Development Items - Turned off for now
+#**********************************************************************************
+# Change remote directory
+#cd /opt/ftp/states/ut/iCharts_ECM/dev
+# Force binary mode transfer
+#option transfer binary
+# put all html files in folder
+#put C:\Users\Beau.Uriona\Desktop\awPlot_ECM\basinCharts\Curr\*
+
+#**********************************************************************************
+#				Status Webpage
+#**********************************************************************************
+
+# Change remote directory
+cd /opt/ftp/states/ut/iCharts_ECM/misc
+# Force binary mode transfer
+option transfer binary
+# put all html files in folder
+put C:\Users\Beau.Uriona\Desktop\awPlot_ECM\static\prodStatus.html
+
+# Disconnect
+close
+# Exit WinSCP
+exit
+
