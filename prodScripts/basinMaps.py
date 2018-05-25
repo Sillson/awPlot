@@ -4,7 +4,6 @@ Created on Fri Nov 17 13:55:01 2017
 
 @author: Beau.Uriona
 """
-import sys
 from os import path, makedirs
 import urllib.request as request
 import simplejson as json
