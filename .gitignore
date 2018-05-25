@@ -2,6 +2,7 @@
 __pycache__/
 *.py[cod]
 *$py.class
+
 # vscode settings
 .vscode/
 
@@ -68,6 +69,11 @@ docs/_build/
 
 # PyBuilder
 target/
+
+#html folders
+basinMaps/
+basinCharts/
+siteCharts/
 
 # Jupyter Notebook
 .ipynb_checkpoints
