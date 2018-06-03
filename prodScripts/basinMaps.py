@@ -4,28 +4,25 @@ Created on Fri Nov 17 13:55:01 2017
 
 @author: Beau.Uriona
 """
-from os import path, makedirs
+import os
 import urllib.request as request
 import simplejson as json
 import plotly.graph_objs as go
 import plotly.offline as py
-#from zeep import Client
-#from zeep.transports import Transport
-#from zeep.cache import InMemoryCache
 import datetime
 import numpy as np
 import warnings
 import time
 import csv
+import sys
 from lib.awdbToolsJson import dataUrl, getGeoData, getBasinSites
+from lib.constants import NETWORKS
+from lib.keys import mapbox_token
 
-this_dir = path.dirname(path.abspath(__file__))
-master_dir = path.dirname(this_dir)
+prod_scripts_dir = os.path.abspath(os.path.dirname(sys.argv[0]))
 
-mapBox_token = r'pk.eyJ1IjoiYmVhdXRhaCIsImEiOiJjajViNzZ5YngwaG9kMzZyeTRibDFrOGt4In0.6Ipwx1r4rm5I85yFo7gshg'
-#wsdl = r"https://wcc.sc.egov.usda.gov/awdbWebService/services?WSDL"
-#transport = Transport(timeout=300,cache=InMemoryCache())
-#awdb = Client(wsdl=wsdl,transport=transport,strict=False)
+this_dir = os.path.dirname(os.path.abspath(__file__))
+master_dir = os.path.dirname(this_dir)
 
 dt = datetime.datetime
 date = datetime.date
@@ -40,15 +37,13 @@ def updtChart(basinName, basinSites, basinTable):
         geoData = getGeoData(hucList)
     else:
         geoData = []
-    networks = [r'SNTL',r'SCAN',r'SNTLT']
-#    basinSites = getBasinSites(basin,basinTable)
     
     url = '/'.join([dataUrl,'metadata', 'ALL', 'metadata.json'])
     with request.urlopen(url) as data:
         meta = json.loads(data.read().decode())
     
     meta[:] = [x for x in meta if str.split(x['stationTriplet'],":")[2] in 
-        networks and str.split(x['stationTriplet'],":")[0] in basinSites]
+        NETWORKS and str.split(x['stationTriplet'],":")[0] in basinSites]
     
     validTrip = [x['stationTriplet'] for x in meta]
     validLong = [x['longitude'] for x in meta]
@@ -76,8 +71,6 @@ def updtChart(basinName, basinSites, basinTable):
                  r'SCAN' in validTrip[index]]
         validTextSNTLT = [x for index, x in enumerate(validText) if
                  r'SNTLT' in validTrip[index]]
-#            validAnno[:] = [x for index, x in enumerate(validAnno) if
-#                     hasattr(normData[index], 'values')]
         
         zoomLat = abs(abs(np.max(validLat))-abs(np.min(validLat)))
         zoomLong = abs(abs(np.max(validLong))-abs(np.min(validLong)))
@@ -158,7 +151,7 @@ def updtChart(basinName, basinSites, basinTable):
                 autosize=True, 
                 hovermode='closest',
                 mapbox=dict(
-                        accesstoken=mapBox_token,
+                        accesstoken=mapbox_token(),
                         style='outdoors',
                         layers=[dict(
                                 sourcetype='geojson',
@@ -185,8 +178,8 @@ if __name__ == '__main__':
     for state in states:
         delimiter = ','
         basinTable = {}
-        basinDefDir = path.join(master_dir, r'static')
-        basinDefFileName = path.join(basinDefDir,'basinDef_' + state + r'.csv')
+        basinDefDir = os.path.join(master_dir, r'static')
+        basinDefFileName = os.path.join(basinDefDir,'basinDef_' + state + r'.csv')
         with open(basinDefFileName, 'r') as data_file:
             data = csv.reader(data_file, delimiter=delimiter)
             headers = next(data)[1:]
@@ -202,9 +195,9 @@ if __name__ == '__main__':
         
         for basinName in basinTable:
             bt = time.time()
-            dirPath = path.join(master_dir, 'basinMaps', state)
-            plotName = path.join(dirPath, basinName + r'.html')
-            makedirs(dirPath, exist_ok=True)
+            dirPath = os.path.join(master_dir, 'basinMaps', state)
+            plotName = os.path.join(dirPath, basinName + r'.html')
+            os.makedirs(dirPath, exist_ok=True)
             try:
                 basinSites = getBasinSites(basinName, basinTable)
                 fig = go.Figure(updtChart(basinName, basinSites, basinTable))
@@ -217,4 +210,4 @@ if __name__ == '__main__':
                     newPlotFile.write(plotStr)
             except:
                 print('     No sites with that sensor in that basin, no chart created')
-            print(f'     in {round(time.time()-bt,2)} seconds')
+                print(f'     in {round(time.time()-bt,2)} seconds')

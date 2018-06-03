@@ -6,9 +6,7 @@ Created on Tue Feb  7 10:41:31 2017
 """
 from os import path, makedirs
 import urllib.request as request
-#from zeep import Client
-#from zeep.transports import Transport
-#from zeep.cache import InMemoryCache
+
 import datetime
 import plotly.graph_objs as go
 import plotly.offline as py
@@ -25,9 +23,6 @@ py.init_notebook_mode(connected=True)
 this_dir = path.dirname(path.abspath(__file__))
 master_dir = path.dirname(this_dir)
 
-#wsdl = r"https://wcc.sc.egov.usda.gov/awdbWebService/services?WSDL"
-#transport = Transport(timeout=300,cache=InMemoryCache())
-#awdb = Client(wsdl=wsdl,transport=transport,strict=False)
 
 dt = datetime.datetime
 date = datetime.date

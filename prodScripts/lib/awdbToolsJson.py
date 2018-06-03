@@ -21,7 +21,9 @@ dt = datetime.datetime
 date = datetime.date
 today = dt.utcnow() - datetime.timedelta(hours=8)
 
-dataUrl = r'https://ecm.nrcs.usda.gov/Internet/WCIS/sitedata'
+dataUrl = r'https://www.wcc.nrcs.usda.gov/ftpref/states/ut/iCharts/data'
+# prod_data_url = r'https://ecm.nrcs.usda.gov/Internet/WCIS/sitedata'
+
 
 def isActive(x):
     if dt.strptime(x.endDate, "%Y-%m-%d %H:%M:%S").date() > today.date():

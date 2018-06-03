@@ -28,6 +28,8 @@ master_dir = path.dirname(this_dir)
 #transport = Transport(timeout=300,cache=InMemoryCache())
 #awdb = Client(wsdl=wsdl,transport=transport,strict=False)
 
+# basin is an average of sites
+
 dt = datetime.datetime
 date = datetime.date
 today = dt.utcnow() - datetime.timedelta(hours=8)
