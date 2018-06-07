@@ -79,7 +79,8 @@ def nonLeapDaysBetween(_sDateLeap,_eDateLeap):
     return nonLeapDays
 
 def padMissingData(x,_sDate,_eDate):
-#    if not hasattr(x, r'values'): return x                                        
+#    if not hasattr(x, r'values'): return x
+#    hasattr? run on other side of the threading. multivariate correlation analysis                                         
     eDateChkSite = dt.strptime(x['endDate'],"%Y-%m-%d %H:%M:%S").date()
     eDateChkBasin = dt.strptime(_eDate,"%Y-%m-%d").date()
     if eDateChkBasin > eDateChkSite:
