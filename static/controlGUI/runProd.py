@@ -95,11 +95,15 @@ def runProduction():
         <meta http-equiv="content-type" content="text/html; charset=utf-8">
         <title>iChart Production Status</title> </head> <body> <p>REPLACE</p>
         </body> </html>'''
+
+        # Perhaps change to a yield block above? 
         
         htmlStr = htmlStr.replace(r'REPLACE', logStr)
         htmlStr = htmlStr.replace('\n', r'<br>')
         htmlStr = htmlStr.replace('\t', r'<LI>')
         writeToProdStatus(htmlStr)
+
+        # HTML scrub or encode methods? perhaps there is a library for this
         
         currErrCodes = list(exitCodes)
         for index, err in enumerate(currErrCodes):
