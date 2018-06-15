@@ -6,9 +6,6 @@ Created on Tue Feb  7 10:41:31 2017
 """
 from os import path, makedirs
 import urllib.request as request
-#from zeep import Client
-#from zeep.transports import Transport
-#from zeep.cache import InMemoryCache
 import datetime
 import plotly.graph_objs as go
 import plotly.offline as py
@@ -21,14 +18,11 @@ import warnings
 import math
 import time
 from lib.awdbToolsJson import dataUrl, trimToOct1, padMissingData, ordinal, getBasinSites
+
 py.init_notebook_mode(connected=True)
 
 this_dir = path.dirname(path.abspath(__file__))
 master_dir = path.dirname(this_dir)
-
-#wsdl = r"https://wcc.sc.egov.usda.gov/awdbWebService/services?WSDL"
-#transport = Transport(timeout=300,cache=InMemoryCache())
-#awdb = Client(wsdl=wsdl,transport=transport,strict=False)
 
 dt = datetime.datetime
 date = datetime.date
@@ -54,46 +48,45 @@ def updtChart(basinName, basinSites):
     basinNormData = []
     basinPlotNormData = []
     validTrip = []
-    
-    networks = [r'SNTL',r'SCAN',r'SNTLT']
+
+    networks = [r'SNTL', r'SCAN', r'SNTLT']
     sensor = r"PREC"
-        
-    url = '/'.join([dataUrl,'metadata', sensor, 'metadata.json'])
+
+    url = '/'.join([dataUrl, 'metadata', sensor, 'metadata.json'])
     with request.urlopen(url) as data:
         meta = json.loads(data.read().decode())
-    
-    meta[:] = [x for x in meta if str.split(x['stationTriplet'],":")[2] in 
-        networks and str.split(x['stationTriplet'],":")[0] in basinSites]
+
+    meta[:] = [x for x in meta if str.split(x['stationTriplet'], ":")[2] in
+               networks and str.split(x['stationTriplet'], ":")[0] in basinSites]
 
     validTrip = [x['stationTriplet'] for x in meta]
-    date_series = [date(2015,10,1) + datetime.timedelta(days=x)
-                        for x in range(0, 366)] #could use any year with a leap day
-    
-    if validTrip:   
+    date_series = [date(2015, 10, 1) + datetime.timedelta(days=x)
+                   for x in range(0, 366)] #could use any year with a leap day
+
+    if validTrip:
         normData = []
-        for triplet in validTrip: 
-            url = '/'.join([dataUrl,'normals', 'DAILY', sensor, 
-                            triplet.replace(':','_') + '.json'])
+        for triplet in validTrip:
+            url = '/'.join([dataUrl, 'normals', 'DAILY', sensor,
+                            triplet.replace(':', '_') + '.json'])
             with request.urlopen(url) as d:
                 jTemp = json.loads(d.read().decode())
             normData.append(jTemp)
 
-        basinNormData = [np.array(x['values'], dtype=np.float) for x in 
+        basinNormData = [np.array(x['values'], dtype=np.float) for x in
                          normData if x['values']]
 
     if basinNormData:
         basinPlotNormData = list(
-                np.nanmean(np.array([i for i in basinNormData]), axis=0))
-        
+            np.nanmean(np.array([i for i in basinNormData]), axis=0))
+
         validTrip[:] = [x for index, x in enumerate(validTrip) if
-                 normData[index]['values']]  
-   
+                        normData[index]['values']]
+
     beginDateDict = {}
     for siteMeta in meta:
         beginDateDict.update(
-                {str(siteMeta['stationTriplet']) : 
-                    dt.strptime(str(siteMeta['beginDate']),
-                                "%Y-%m-%d %H:%M:%S")}) 
+            {str(siteMeta['stationTriplet']) :
+                dt.strptime(str(siteMeta['beginDate']), "%Y-%m-%d %H:%M:%S")})
 
     basinBeginDate = min(beginDateDict.values())
 
@@ -106,14 +99,13 @@ def updtChart(basinName, basinSites):
                 sYear = basinBeginDate.year
             else:
                 sYear = basinBeginDate.year + 1
-    
+
     sDate = date(sYear, 10, 1).strftime("%Y-%m-%d")             
     eDate = today.date().strftime("%Y-%m-%d")
 
     data = []
-    for triplet in validTrip: 
-        url = '/'.join([dataUrl,'DAILY', sensor, 
-                        triplet.replace(':','_') + '.json'])
+    for triplet in validTrip:
+        url = '/'.join([dataUrl,'DAILY', sensor, triplet.replace(':', '_') + '.json'])
         with request.urlopen(url) as d:
             jTemp = json.loads(d.read().decode())
         data.append(trimToOct1(jTemp))
@@ -126,8 +118,7 @@ def updtChart(basinName, basinSites):
     
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", category=RuntimeWarning)
-        basinPlotData = list(np.nanmean(
-                np.array([i for i in plotData]), axis=0))
+        basinPlotData = list(np.nanmean(np.array([i for i in plotData]), axis=0))
 
     PORplotData = list([basinPlotData[i:i+366] 
                     for i in range(0,len(basinPlotData),366)])
@@ -143,10 +134,10 @@ def updtChart(basinName, basinSites):
             minData = [np.nanmin(a) for a in statsData]
             maxData = [np.nanmax(a) for a in statsData]
             meanData = [np.nanmean(a) for a in statsData]
-            lowestData = [np.nanpercentile(a,10) for a in statsData]
-            highestData = [np.nanpercentile(a,90) for a in statsData]
-            lowData = [np.nanpercentile(a,30) for a in statsData]
-            highData = [np.nanpercentile(a,70) for a in statsData]
+            lowestData = [np.nanpercentile(a, 10) for a in statsData]
+            highestData = [np.nanpercentile(a, 90) for a in statsData]
+            lowData = [np.nanpercentile(a, 30) for a in statsData]
+            highData = [np.nanpercentile(a, 70) for a in statsData]
         sliderDates = list(chain([(date_series[0])] + 
                                       [date_series[-1]]))
     else:
@@ -158,20 +149,20 @@ def updtChart(basinName, basinSites):
             if index == len(PORplotData)-1:
                 trace.extend(
                         [go.Scatter(
-                                x=date_series,y=i,
+                                x=date_series, y=i,
                                 name=str(sYear + index + 1),
                                 visible=True,connectgaps=True,
                                 line=dict(color='rgb(0,0,0)'))])
             elif np.nansum(i) > 0:
                 trace.extend(
-                        [go.Scatter(x=date_series,y=i,
+                        [go.Scatter(x=date_series, y=i,
                                     name=str(sYear + index + 1),
                                     visible='legendonly',
                                     connectgaps=True)])
     if meanData:
         if lowestData:
             trace.extend(
-                    [go.Scatter(x=date_series,y=minData
+                    [go.Scatter(x=date_series, y=minData
                                 ,legendgroup='centiles',name=r'Min',
                                 visible=True,mode='line',
                                 line=dict(width=0),connectgaps=True,
@@ -179,7 +170,7 @@ def updtChart(basinName, basinSites):
                                 fill='none',showlegend=False,
                                 hoverinfo='none')])       
             trace.extend(
-                    [go.Scatter(x=date_series,y=lowestData
+                    [go.Scatter(x=date_series, y=lowestData
                                 ,legendgroup='centiles',name=r'10%',
                                 visible=True,mode='line',
                                 line=dict(width=0),connectgaps=True,
@@ -188,7 +179,7 @@ def updtChart(basinName, basinSites):
                                 hoverinfo='none')])
         if lowData:
             trace.extend(
-                    [go.Scatter(x=date_series,y=lowData,
+                    [go.Scatter(x=date_series, y=lowData,
                                 legendgroup='centiles',name=r'30%',
                                 visible=True,mode='line',
                                 line=dict(width=0),connectgaps=True,
@@ -197,7 +188,7 @@ def updtChart(basinName, basinSites):
                                 hoverinfo='none')])
         if highData:
             trace.extend(
-                    [go.Scatter(x=date_series,y=highData,
+                    [go.Scatter(x=date_series, y=highData,
                                 legendgroup='centiles',
                                 name=r'Stats. Shading',
                                 visible=True,mode='line',
@@ -207,7 +198,7 @@ def updtChart(basinName, basinSites):
                                 hoverinfo='none')])
         if highestData:
             trace.extend(
-                    [go.Scatter(x=date_series,y=highestData,
+                    [go.Scatter(x=date_series, y=highestData,
                                 legendgroup='centiles',connectgaps=True,
                                 name=r'90%',visible=True
                                 ,mode='line',line=dict(width=0),
@@ -215,7 +206,7 @@ def updtChart(basinName, basinSites):
                                 fill='tonexty',showlegend=False,
                                 hoverinfo='none')])
             trace.extend(
-                    [go.Scatter(x=date_series,y=maxData
+                    [go.Scatter(x=date_series, y=maxData
                                 ,legendgroup='centiles',name=r'Max',
                                 visible=True,mode='line',
                                 line=dict(width=0),connectgaps=True,
@@ -225,7 +216,7 @@ def updtChart(basinName, basinSites):
 
     if minData:
         trace.extend(
-                [go.Scatter(x=date_series,y=minData,
+                [go.Scatter(x=date_series, y=minData,
                             name=r'Min',visible=True,
                             hoverinfo='none',connectgaps=True,
                             line=dict(color='rgba(237,0,0,0.5)'))])
@@ -234,7 +225,7 @@ def updtChart(basinName, basinSites):
         trace.extend(
                 [go.Scatter(x=date_series,
                             y=basinPlotNormData,
-                            name=r"Normal ('81-'10)",connectgaps=True,
+                            name=r"Normal ('81-'10)", connectgaps=True,
                             visible=True,hoverinfo='none',
                             line=dict(color='rgba(0,237,0,0.4)'))])
     
@@ -358,7 +349,12 @@ def updtChart(basinName, basinSites):
             'layout': layout}
 
 if __name__ == '__main__':
-    states = [r"UT",r"NV_CA",'AK','AZ','CA','CO','ID','MT','NM','OR','WA','WY']
+    states = [
+        r"UT", r"NV_CA", 'AK',
+        'AZ', 'CA', 'CO', 'ID',
+        'MT', 'NM', 'OR', 'WA',
+        'WY'
+        ]
     sensor = 'PREC'
     
     for state in states:
@@ -397,5 +393,5 @@ if __name__ == '__main__':
                     newPlotFile.write(plotStr)
             except:
                 print('     No sites with that sensor in that basin, no chart created')
-            print(f'     in {round(time.time()-bt,2)} seconds')
+                print(f'     in {round(time.time()-bt, 2)} seconds')
             

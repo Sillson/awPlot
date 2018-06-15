@@ -403,5 +403,5 @@ if __name__ == '__main__':
                     newPlotFile.write(plotStr)
             except:
                 print('     No sites with that sensor in that basin, no chart created')
-            print(f'     in {round(time.time()-bt,2)} seconds')
+                print(f'     in {round(time.time()-bt,2)} seconds')
             

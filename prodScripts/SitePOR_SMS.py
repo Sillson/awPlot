@@ -6,9 +6,6 @@ Created on Tue Feb  7 10:41:31 2017
 """
 from os import path, makedirs
 import urllib.request as request
-#from zeep import Client
-#from zeep.transports import Transport
-#from zeep.cache import InMemoryCache
 import datetime
 import plotly.graph_objs as go
 import plotly.offline as py
